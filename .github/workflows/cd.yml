@@ -1,0 +1,69 @@
+name: Publish & Deploy 🚀
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: './publish'
+  DOTNET_VERSION: '9.0.x'
+#  AZURE_WEBAPP_NAME: web-api
+#  IMAGE_NAME: dotnet-clean-architecture
+#  IMAGE_TAG: ${{ github.run_number }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+
+      - name: Setup .NET 📦
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build and Publish 📂
+        run: |
+          dotnet restore src/Web.Api
+          dotnet build src/Web.Api -c Release --no-restore
+          dotnet publish src/Web.Api -c Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+
+#      Uncomment below steps if you want to build and push Docker image
+#      - name: Login to Dockerhub 🐳
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_TOKEN }}
+
+#      - name: Build and tag Docker image
+#        run: docker build -f src/Web.Api/Dockerfile . -t ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:v$IMAGE_TAG
+
+#      - name: Push Docker image 🚀
+#        run: docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:v$IMAGE_TAG
+
+#      - name: Update image metadata 📝
+#        uses: docker/metadata-action@v5
+#        with:
+#          images: ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:v$IMAGE_TAG
+#          tags: |
+#            type=sha
+#          labels: |
+#            org.opencontainers.image.title=Dotnet Clean Architecture
+#            org.opencontainers.image.description=Build docker image for .Net with github-action and docker hub
+#            org.opencontainers.image.url=https://github.com/${{github.repository}}
+#            org.opencontainers.image.revision=${{github.sha}}
+#            org.opencontainers.image.licenses=MIT
+
+#      Uncomment below steps if you want to deploy to Azure
+#      - name: Deploy to Azure 🌌
+#        uses: azure/webapps-deploy@v2
+#        with:
+#         app-name: ${{ env.AZURE_WEBAPP_NAME }}
+#         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+#         package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
