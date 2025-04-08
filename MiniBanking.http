@@ -1,6 +1,0 @@
-@MiniBanking_HostAddress = http://localhost:5298
-
-GET {{MiniBanking_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
