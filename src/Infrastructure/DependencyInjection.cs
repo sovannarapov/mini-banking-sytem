@@ -9,10 +9,8 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-    {
-        return services.AddDatabase(configuration);
-    }
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) 
+        => services.AddDatabase(configuration).AddHealthChecks(configuration);
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -25,6 +23,15 @@ public static class DependencyInjection
                 ));
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+
+        return services;
+    }
+
+    private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddHealthChecks()
+            .AddSqlServer(configuration.GetConnectionString("Database")!);
 
         return services;
     }
