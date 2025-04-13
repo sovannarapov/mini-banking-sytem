@@ -24,8 +24,4 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Web.Api.csproj.user" />
-  </ItemGroup>
-
 </Project>
