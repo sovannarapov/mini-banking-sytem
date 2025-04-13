@@ -1,2 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="MediatR.Contracts" />
+    </ItemGroup>
+
 </Project>
