@@ -15,5 +15,10 @@ internal sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder
             .HasIndex(acc => acc.AccountNumber)
             .IsUnique();
+
+        builder.Property(acc => acc.AccountType)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired();
     }
 }
