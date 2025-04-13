@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Domain.Accounts;
 
 namespace Domain.Transactions;
