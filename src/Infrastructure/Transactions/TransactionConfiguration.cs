@@ -12,6 +12,11 @@ internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transa
 
         builder.HasKey(trans => trans.Id);
 
+        builder.Property(trans => trans.Type)
+               .HasConversion<string>()
+               .HasMaxLength(20)
+               .IsRequired();
+
         builder.HasIndex(trans => trans.AccountId);
         builder.HasIndex(trans => trans.Timestamp);
     }
