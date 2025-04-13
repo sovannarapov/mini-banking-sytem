@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Database.Migrations;
 
 /// <inheritdoc />
-public partial class Create_Database : Migration
+public partial class InitialCreate : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,9 +18,9 @@ public partial class Create_Database : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 AccountNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                AccountType = table.Column<int>(type: "int", nullable: false),
-                Balance = table.Column<double>(type: "float", nullable: false),
-                CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                AccountType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
             },
             constraints: table => table.PrimaryKey("PK_Accounts", x => x.Id));
 
@@ -29,11 +29,11 @@ public partial class Create_Database : Migration
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Type = table.Column<int>(type: "int", nullable: false),
-                Amount = table.Column<double>(type: "float", nullable: false),
+                AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                 TargetAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
             },
             constraints: table =>
             {

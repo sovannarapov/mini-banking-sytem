@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Database.Migrations;
 
 [DbContext(typeof(ApplicationDbContext))]
-[Migration("20250410130049_Create_Database")]
-partial class Create_Database
+[Migration("20250413062604_InitialCreate")]
+partial class InitialCreate
 {
     /// <inheritdoc />
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,14 +35,16 @@ partial class Create_Database
                     .IsRequired()
                     .HasColumnType("nvarchar(450)");
 
-                b.Property<int>("AccountType")
-                    .HasColumnType("int");
+                b.Property<string>("AccountType")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                b.Property<double>("Balance")
-                    .HasColumnType("float");
+                b.Property<decimal>("Balance")
+                    .HasColumnType("decimal(18,2)");
 
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
                 b.Property<string>("OwnerName")
                     .IsRequired()
@@ -65,17 +67,19 @@ partial class Create_Database
                 b.Property<Guid>("AccountId")
                     .HasColumnType("uniqueidentifier");
 
-                b.Property<double>("Amount")
-                    .HasColumnType("float");
+                b.Property<decimal>("Amount")
+                    .HasColumnType("decimal(18,2)");
 
                 b.Property<string>("TargetAccountNumber")
                     .HasColumnType("nvarchar(max)");
 
-                b.Property<DateTime>("Timestamp")
-                    .HasColumnType("datetime2");
+                b.Property<DateTimeOffset>("Timestamp")
+                    .HasColumnType("datetimeoffset");
 
-                b.Property<int>("Type")
-                    .HasColumnType("int");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
                 b.HasKey("Id");
 
