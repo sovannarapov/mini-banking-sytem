@@ -32,14 +32,18 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                     .IsRequired()
                     .HasColumnType("nvarchar(450)");
 
-                b.Property<int>("AccountType")
-                    .HasColumnType("int");
+                b.Property<string>("AccountType")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)")
+                    .HasComment("The type of account: Savings, Checking, and Business.");
 
-                b.Property<double>("Balance")
-                    .HasColumnType("float");
+                b.Property<decimal>("Balance")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("decimal(18,2)");
 
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
                 b.Property<string>("OwnerName")
                     .IsRequired()
@@ -62,17 +66,21 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
                 b.Property<Guid>("AccountId")
                     .HasColumnType("uniqueidentifier");
 
-                b.Property<double>("Amount")
-                    .HasColumnType("float");
+                b.Property<decimal>("Amount")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("decimal(18,2)");
 
                 b.Property<string>("TargetAccountNumber")
                     .HasColumnType("nvarchar(max)");
 
-                b.Property<DateTime>("Timestamp")
-                    .HasColumnType("datetime2");
+                b.Property<DateTimeOffset>("Timestamp")
+                    .HasColumnType("datetimeoffset");
 
-                b.Property<int>("Type")
-                    .HasColumnType("int");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)")
+                    .HasComment("The type of transaction: Deposit, Withdrawal, and Transfer.");
 
                 b.HasKey("Id");
 
@@ -101,4 +109,3 @@ partial class ApplicationDbContextModelSnapshot : ModelSnapshot
 #pragma warning restore 612, 618
     }
 }
-
