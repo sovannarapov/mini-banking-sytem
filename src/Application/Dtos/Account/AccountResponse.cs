@@ -1,5 +1,3 @@
-using Domain.Accounts;
-
 namespace Application.Dtos.Account;
 
 public sealed record AccountResponse(
