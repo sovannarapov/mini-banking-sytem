@@ -6,5 +6,5 @@ public sealed record TransactionResponse(
     string Type,
     decimal Amount,
     string? TargetAccountNumber,
-    DateTimeOffset Timestamp
+    DateTimeOffset CreatedAt
 );
