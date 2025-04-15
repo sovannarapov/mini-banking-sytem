@@ -9,6 +9,6 @@ public sealed class Transaction
     public TransactionType Type { get; set; }
     public decimal Amount { get; set; }
     public string? TargetAccountNumber { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
     public Account Account { get; set; }
 }
