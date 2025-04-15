@@ -22,6 +22,6 @@ internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transa
             .HasPrecision(18, 2);
 
         builder.HasIndex(trans => trans.AccountId);
-        builder.HasIndex(trans => trans.Timestamp);
+        builder.HasIndex(trans => trans.CreatedAt);
     }
 }

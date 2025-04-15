@@ -33,7 +33,7 @@ public partial class InitialCreate : Migration
                 Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, comment: "The type of transaction: Deposit, Withdrawal, and Transfer."),
                 Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                 TargetAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
             },
             constraints: table =>
             {
@@ -58,9 +58,9 @@ public partial class InitialCreate : Migration
             column: "AccountId");
 
         migrationBuilder.CreateIndex(
-            name: "IX_Transactions_Timestamp",
+            name: "IX_Transactions_CreatedAt",
             table: "Transactions",
-            column: "Timestamp");
+            column: "CreatedAt");
     }
 
     /// <inheritdoc />
