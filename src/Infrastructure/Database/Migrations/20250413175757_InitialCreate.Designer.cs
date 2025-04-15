@@ -76,7 +76,7 @@ partial class InitialCreate
                 b.Property<string>("TargetAccountNumber")
                     .HasColumnType("nvarchar(max)");
 
-                b.Property<DateTimeOffset>("Timestamp")
+                b.Property<DateTimeOffset>("CreatedAt")
                     .HasColumnType("datetimeoffset");
 
                 b.Property<string>("Type")
@@ -89,7 +89,7 @@ partial class InitialCreate
 
                 b.HasIndex("AccountId");
 
-                b.HasIndex("Timestamp");
+                b.HasIndex("CreatedAt");
 
                 b.ToTable("Transactions", (string)null);
             });
