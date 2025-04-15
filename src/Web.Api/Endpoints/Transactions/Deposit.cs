@@ -23,6 +23,11 @@ internal sealed class Deposit : IEndpoint
                 Result<TransactionResponse> result = await sender.Send(command, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
-            });
+            })
+            .HasApiVersion(1.0)
+            .Produces<TransactionResponse>(StatusCodes.Status200OK)
+            .WithSummary("Create a new deposit transaction")
+            .WithDescription("Creates a new deposit transaction for the specified account.")
+            .WithTags(Tags.Transactions);
     }
 }
