@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace Application.Features.Transactions.Deposit;
 
-public class DepositCommandValidator : AbstractValidator<DepositCommand>
+public class DepositTransactionCommandValidator : AbstractValidator<DepositTransactionCommand>
 {
-    public DepositCommandValidator()
+    public DepositTransactionCommandValidator()
     {
         RuleFor(dp => dp.AccountId)
             .NotEmpty()

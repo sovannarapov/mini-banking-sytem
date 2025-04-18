@@ -14,7 +14,7 @@ internal sealed class Deposit : IEndpoint
         endpoints.MapPost("/transactions/deposit",
             async (DepositRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
-                var command = new DepositCommand
+                var command = new DepositTransactionCommand
                 {
                     AccountId = request.AccountId,
                     Amount = request.Amount
