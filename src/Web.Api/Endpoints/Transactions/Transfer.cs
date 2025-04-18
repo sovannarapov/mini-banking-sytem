@@ -25,7 +25,7 @@ internal sealed class Transfer : IEndpoint
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .HasApiVersion(1.0)
-            .Produces<TransactionResponse>(StatusCodes.Status200OK)
+            .Produces<TransactionResponse>()
             .WithSummary("Create a new transfer transaction")
             .WithDescription("Creates a new transfer transaction for the specified account.")
             .WithTags(Tags.Transactions);
