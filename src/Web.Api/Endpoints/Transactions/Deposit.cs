@@ -14,18 +14,14 @@ internal sealed class Deposit : IEndpoint
         endpoints.MapPost("/transactions/deposit",
             async (DepositRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
-                var command = new DepositTransactionCommand
-                {
-                    AccountId = request.AccountId,
-                    Amount = request.Amount
-                };
+                var command = new DepositTransactionCommand(request.AccountId, request.Amount);
 
                 Result<TransactionResponse> result = await sender.Send(command, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .HasApiVersion(1.0)
-            .Produces<TransactionResponse>(StatusCodes.Status200OK)
+            .Produces<TransactionResponse>()
             .WithSummary("Create a new deposit transaction")
             .WithDescription("Creates a new deposit transaction for the specified account.")
             .WithTags(Tags.Transactions);
