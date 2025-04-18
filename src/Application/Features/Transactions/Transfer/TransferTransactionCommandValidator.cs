@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace Application.Features.Transactions.Transfer;
 
-public class TransferCommandValidator : AbstractValidator<TransferCommand>
+public class TransferTransactionCommandValidator : AbstractValidator<TransferTransactionCommand>
 {
-    public TransferCommandValidator()
+    public TransferTransactionCommandValidator()
     {
         RuleFor(transferCommand => transferCommand.AccountId)
             .NotEmpty()
