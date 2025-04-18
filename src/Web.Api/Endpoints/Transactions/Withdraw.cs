@@ -14,7 +14,7 @@ internal sealed class Withdraw : IEndpoint
     {
         endpoints.MapPost("/transactions/withdraw", async (WithdrawRequest request, ISender sender, CancellationToken cancellationToken) =>
         {
-            var command = new WithdrawCommand
+            var command = new WithdrawTransactionCommand
             {
                 AccountId = request.AccountId,
                 Amount = request.Amount

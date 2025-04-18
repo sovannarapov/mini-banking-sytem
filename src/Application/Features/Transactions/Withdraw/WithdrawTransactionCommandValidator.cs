@@ -2,17 +2,17 @@ using FluentValidation;
 
 namespace Application.Features.Transactions.Withdraw;
 
-public class WithdrawCommandValidator : AbstractValidator<WithdrawCommand>
+public class WithdrawTransactionCommandValidator : AbstractValidator<WithdrawTransactionCommand>
 {
-    public WithdrawCommandValidator()
+    public WithdrawTransactionCommandValidator()
     {
-        RuleFor(dp => dp.AccountId)
+        RuleFor(withDrawTransactionCommand => withDrawTransactionCommand.AccountId)
             .NotEmpty()
             .WithMessage("Account ID is required.")
             .Must(id => Guid.TryParse(id.ToString(), out _))
             .WithMessage("Account ID must be a valid GUID.");
         
-        RuleFor(dp => dp.Amount)
+        RuleFor(withDrawTransactionCommand => withDrawTransactionCommand.Amount)
             .NotNull()
             .WithMessage("Amount should not be null.")
             .GreaterThan(0)

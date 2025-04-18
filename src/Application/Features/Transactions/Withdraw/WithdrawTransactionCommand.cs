@@ -3,7 +3,7 @@ using Application.Dtos.Transaction;
 
 namespace Application.Features.Transactions.Withdraw;
 
-public sealed class WithdrawCommand : ICommand<TransactionResponse>
+public sealed class WithdrawTransactionCommand : ICommand<TransactionResponse>
 {
     public Guid AccountId { get; set; }
     public decimal Amount { get; set; }
