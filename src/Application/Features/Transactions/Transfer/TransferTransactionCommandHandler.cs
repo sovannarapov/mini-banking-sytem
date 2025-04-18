@@ -2,97 +2,111 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Dtos.Transaction;
 using Domain.Accounts;
-using Domain.Extensions;
+using Domain.Constants;
 using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Serilog.Core;
+using Serilog;
 using Shared;
 
 namespace Application.Features.Transactions.Transfer;
 
-internal sealed class TransferCommandHandler(IApplicationDbContext context, TimeProvider timeProvider, Logger logger)
-    : ICommandHandler<TransferTransactionCommand, TransactionResponse>
+internal sealed class TransferTransactionCommandHandler(
+    IApplicationDbContext context,
+    TimeProvider timeProvider,
+    ILogger logger)
+    : ICommandHandler<TransferTransactionCommand, TransferResponse>
 {
-    private const decimal MaxWithdrawAmount = 100000M;
-
-    public async Task<Result<TransactionResponse>> Handle(TransferTransactionCommand transactionCommand, CancellationToken cancellationToken)
+    public async Task<Result<TransferResponse>> Handle(TransferTransactionCommand command,
+        CancellationToken cancellationToken)
     {
-        switch (transactionCommand.Amount)
+        if (command.Amount <= TransactionConstants.MinTransactionAmount)
         {
-            case <= 0:
-                logger.Warning("Invalid withdrawal amount: {Amount}", transactionCommand.Amount);
-                return Result.Failure<TransactionResponse>(TransactionError.InvalidAmount(transactionCommand.Amount));
-            case > MaxWithdrawAmount:
-                logger.Warning("Withdrawal amount exceeds maximum limit: {Amount}", transactionCommand.Amount);
-                return Result.Failure<TransactionResponse>(TransactionError.ExceedsMaximumLimit(transactionCommand.Amount));
+            logger.Warning("Amount must be greater than {Amount}.", command.Amount);
+            return Result.Failure<TransferResponse>(TransactionError.InvalidAmount(command.Amount));
         }
 
-        Account? account =
-            await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == transactionCommand.AccountId, cancellationToken);
+        Account? sourceAccount =
+            await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == command.AccountId,
+                cancellationToken);
 
-        if (account is null)
+        if (sourceAccount == null)
         {
-            return Result.Failure<TransactionResponse>(AccountError.NotFound(transactionCommand.AccountId));
+            return Result.Failure<TransferResponse>(AccountError.NotFound(command.AccountId));
         }
 
-        if (account.Balance < transactionCommand.Amount)
+        Account? targetAccount =
+            await context.Accounts.FirstOrDefaultAsync(
+                (acc) => acc.AccountNumber == command.TargetAccountNumber, cancellationToken);
+
+        if (targetAccount == null)
+        {
+            return Result.Failure<TransferResponse>(AccountError.NotFound(accountNumber: command.TargetAccountNumber));
+        }
+
+        if (sourceAccount.Balance < command.Amount)
         {
             logger.Warning("Insufficient funds: Account {AccountId}, Balance {Balance}, Withdrawal Amount {Amount}",
-                account.Id, account.Balance, transactionCommand.Amount);
-            return Result.Failure<TransactionResponse>(
-                TransactionError.InsufficientFunds(account.Balance, transactionCommand.Amount));
+                sourceAccount.Id, sourceAccount.Balance, command.Amount);
+            return Result.Failure<TransferResponse>(
+                TransactionError.InsufficientFunds(sourceAccount.Balance, command.Amount));
         }
 
         IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            var transferTransaction = new Transaction
+            var debitTransactionId = Guid.NewGuid();
+            var creditTransactionId = Guid.NewGuid();
+
+            var debitTransaction = new Transaction
             {
-                AccountId = transactionCommand.AccountId,
+                Id = debitTransactionId,
+                AccountId = sourceAccount.Id,
                 Type = TransactionType.Transfer,
-                Amount = -transactionCommand.Amount,
-                TargetAccountNumber = account.AccountNumber,
+                Amount = -command.Amount,
+                TargetAccountNumber = targetAccount.AccountNumber,
                 CreatedAt = timeProvider.GetUtcNow()
             };
+                
+            sourceAccount.Balance -= command.Amount;
+            context.Transactions.Add(debitTransaction);
 
-            context.Transactions.Add(transferTransaction);
-
-            account.Balance += transactionCommand.Amount;
-            context.Accounts.Update(account);
+            var creditTransaction = new Transaction
+            {
+                Id = creditTransactionId,
+                AccountId = targetAccount.Id,
+                Type = TransactionType.Transfer,
+                Amount = command.Amount,
+                TargetAccountNumber = sourceAccount.AccountNumber,
+                CreatedAt = timeProvider.GetUtcNow()
+            };
             
+            targetAccount.Balance += command.Amount;
+            context.Transactions.Add(creditTransaction);
+
             await context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 
             logger.Information(
                 "Withdrawal successful: Account {AccountId}, Amount {Amount}, Remaining Balance {Balance}",
-                account.Id,
-                transactionCommand.Amount,
-                account.Balance);
-
-            var response = new TransactionResponse(
-                transferTransaction.Id,
-                transferTransaction.AccountId,
-                transferTransaction.Type.GetDisplayName(),
-                transferTransaction.Amount,
-                transferTransaction.TargetAccountNumber,
-                transferTransaction.CreatedAt
-            );
-
-            return Result.Success(response);
+                sourceAccount.Id,
+                command.Amount,
+                sourceAccount.Balance);
+            
+            return Result.Success(new TransferResponse(creditTransactionId, debitTransactionId));
         }
         catch (Exception ex)
         {
             logger.Error(
                 ex,
-                "Failed to process withdrawal for account {AccountId}: {Message}",
-                transactionCommand.AccountId,
+                "Failed to process withdrawal for sourceAccount {AccountId}: {Message}",
+                command.AccountId,
                 ex.Message);
 
             await transaction.RollbackAsync(cancellationToken);
 
-            return Result.Failure<TransactionResponse>(TransactionError.Failed(ex.Message));
+            return Result.Failure<TransferResponse>(TransactionError.Failed(ex.Message));
         }
     }
 }
