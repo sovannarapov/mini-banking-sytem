@@ -12,10 +12,14 @@ using Shared;
 
 namespace Application.Features.Transactions.Withdraw;
 
-internal sealed class WithdrawTransactionCommandHandler(IApplicationDbContext context, TimeProvider timeProvider, ILogger logger)
+internal sealed class WithdrawTransactionCommandHandler(
+    IApplicationDbContext context,
+    TimeProvider timeProvider,
+    ILogger logger)
     : ICommandHandler<WithdrawTransactionCommand, TransactionResponse>
 {
-    public async Task<Result<TransactionResponse>> Handle(WithdrawTransactionCommand transactionCommand, CancellationToken cancellationToken)
+    public async Task<Result<TransactionResponse>> Handle(WithdrawTransactionCommand transactionCommand,
+        CancellationToken cancellationToken)
     {
         switch (transactionCommand.Amount)
         {
@@ -24,11 +28,13 @@ internal sealed class WithdrawTransactionCommandHandler(IApplicationDbContext co
                 return Result.Failure<TransactionResponse>(TransactionError.InvalidAmount(transactionCommand.Amount));
             case > TransactionConstants.MaxWithdrawAmount:
                 logger.Warning("Withdrawal amount exceeds maximum limit: {Amount}", transactionCommand.Amount);
-                return Result.Failure<TransactionResponse>(TransactionError.ExceedsMaximumLimit(transactionCommand.Amount));
+                return Result.Failure<TransactionResponse>(
+                    TransactionError.ExceedsMaximumLimit(transactionCommand.Amount));
         }
 
         Account? account =
-            await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == transactionCommand.AccountId, cancellationToken);
+            await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == transactionCommand.AccountId,
+                cancellationToken);
 
         if (account == null)
         {

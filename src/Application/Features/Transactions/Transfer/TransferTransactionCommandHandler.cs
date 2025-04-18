@@ -37,7 +37,7 @@ internal sealed class TransferTransactionCommandHandler(
 
         Account? targetAccount =
             await context.Accounts.FirstOrDefaultAsync(
-                (acc) => acc.AccountNumber == command.TargetAccountNumber, cancellationToken);
+                acc => acc.AccountNumber == command.TargetAccountNumber, cancellationToken);
 
         if (targetAccount == null)
         {
@@ -68,7 +68,7 @@ internal sealed class TransferTransactionCommandHandler(
                 TargetAccountNumber = targetAccount.AccountNumber,
                 CreatedAt = timeProvider.GetUtcNow()
             };
-                
+
             sourceAccount.Balance -= command.Amount;
             context.Transactions.Add(debitTransaction);
 
@@ -81,7 +81,7 @@ internal sealed class TransferTransactionCommandHandler(
                 TargetAccountNumber = sourceAccount.AccountNumber,
                 CreatedAt = timeProvider.GetUtcNow()
             };
-            
+
             targetAccount.Balance += command.Amount;
             context.Transactions.Add(creditTransaction);
 
@@ -93,7 +93,7 @@ internal sealed class TransferTransactionCommandHandler(
                 sourceAccount.Id,
                 command.Amount,
                 sourceAccount.Balance);
-            
+
             return Result.Success(new TransferResponse(creditTransactionId, debitTransactionId));
         }
         catch (Exception ex)
