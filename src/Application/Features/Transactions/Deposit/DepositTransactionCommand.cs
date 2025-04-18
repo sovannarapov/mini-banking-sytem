@@ -3,8 +3,4 @@ using Application.Dtos.Transaction;
 
 namespace Application.Features.Transactions.Deposit;
 
-public sealed class DepositTransactionCommand : ICommand<TransactionResponse>
-{
-    public Guid AccountId { get; set; }
-    public decimal Amount { get; set; }
-}
+public sealed record DepositTransactionCommand(Guid AccountId, decimal Amount) : ICommand<TransactionResponse>;
