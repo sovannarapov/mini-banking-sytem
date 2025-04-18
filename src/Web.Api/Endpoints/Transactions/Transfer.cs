@@ -14,14 +14,13 @@ internal sealed class Transfer : IEndpoint
         endpoints.MapPost("/transactions/transfer",
             async (TransferRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
-                var command = new TransferCommand
-                {
-                    AccountId = request.AccountId,
-                    TargetAccountNumber = request.TargetAccountNumber,
-                    Amount = request.Amount
-                };
+                var command = new TransferTransactionCommand(
+                    request.AccountId,
+                    request.TargetAccountNumber,
+                    request.Amount
+                );
 
-                Result<TransactionResponse> result = await sender.Send(command, cancellationToken);
+                Result<TransferResponse> result = await sender.Send(command, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
