@@ -2,6 +2,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Dtos.Transaction;
 using Domain.Accounts;
+using Domain.Constants;
 using Domain.Extensions;
 using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +15,14 @@ namespace Application.Features.Transactions.Deposit;
 internal sealed class DepositCommandHandler(IApplicationDbContext context, TimeProvider timeProvider, ILogger logger)
     : ICommandHandler<DepositCommand, TransactionResponse>
 {
-    private const decimal MaxDepositAmount = 1000000M;
-
     public async Task<Result<TransactionResponse>> Handle(DepositCommand command, CancellationToken cancellationToken)
     {
         switch (command.Amount)
         {
-            case <= 0:
+            case <= TransactionConstants.MinTransactionAmount:
                 logger.Warning("Invalid deposit amount: {Amount}", command.Amount);
                 return Result.Failure<TransactionResponse>(TransactionError.InvalidAmount(command.Amount));
-            case > MaxDepositAmount:
+            case > TransactionConstants.MaxDepositAmount:
                 logger.Warning("Deposit amount exceeds maximum limit: {Amount}", command.Amount);
                 return Result.Failure<TransactionResponse>(TransactionError.ExceedsMaximumLimit(command.Amount));
         }
@@ -31,17 +30,18 @@ internal sealed class DepositCommandHandler(IApplicationDbContext context, TimeP
         Account? account =
             await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == command.AccountId, cancellationToken);
 
-        if (account is null)
+        if (account == null)
         {
             return Result.Failure<TransactionResponse>(AccountError.NotFound(command.AccountId));
         }
 
-        IDbContextTransaction? transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
             var depositTransaction = new Transaction
             {
+                Id = Guid.NewGuid(),
                 AccountId = command.AccountId,
                 Type = TransactionType.Deposit,
                 Amount = command.Amount,
@@ -49,10 +49,8 @@ internal sealed class DepositCommandHandler(IApplicationDbContext context, TimeP
                 CreatedAt = timeProvider.GetUtcNow()
             };
 
-            context.Transactions.Add(depositTransaction);
-
             account.Balance += command.Amount;
-            context.Accounts.Update(account);
+            context.Transactions.Add(depositTransaction);
 
             await context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
