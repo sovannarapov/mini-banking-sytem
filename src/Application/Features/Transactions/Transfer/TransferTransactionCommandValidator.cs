@@ -1,18 +1,18 @@
 using FluentValidation;
 
-namespace Application.Features.Transactions.Deposit;
+namespace Application.Features.Transactions.Transfer;
 
-public class DepositCommandValidator : AbstractValidator<DepositCommand>
+public class TransferTransactionCommandValidator : AbstractValidator<TransferTransactionCommand>
 {
-    public DepositCommandValidator()
+    public TransferTransactionCommandValidator()
     {
-        RuleFor(dp => dp.AccountId)
+        RuleFor(transferCommand => transferCommand.AccountId)
             .NotEmpty()
             .WithMessage("Account ID is required.")
             .Must(id => Guid.TryParse(id.ToString(), out _))
             .WithMessage("Account ID must be a valid GUID.");
         
-        RuleFor(dp => dp.Amount)
+        RuleFor(transferCommand => transferCommand.Amount)
             .NotNull()
             .WithMessage("Amount should not be null.")
             .GreaterThan(0)

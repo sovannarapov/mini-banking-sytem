@@ -2,6 +2,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Dtos.Transaction;
 using Domain.Accounts;
+using Domain.Constants;
 using Domain.Extensions;
 using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -11,56 +12,59 @@ using Shared;
 
 namespace Application.Features.Transactions.Withdraw;
 
-internal sealed class WithdrawCommandHandler(IApplicationDbContext context, TimeProvider timeProvider, ILogger logger)
-    : ICommandHandler<WithdrawCommand, TransactionResponse>
+internal sealed class WithdrawTransactionCommandHandler(
+    IApplicationDbContext context,
+    TimeProvider timeProvider,
+    ILogger logger)
+    : ICommandHandler<WithdrawTransactionCommand, TransactionResponse>
 {
-    private const decimal MaxWithdrawAmount = 100000M;
-
-    public async Task<Result<TransactionResponse>> Handle(WithdrawCommand command, CancellationToken cancellationToken)
+    public async Task<Result<TransactionResponse>> Handle(WithdrawTransactionCommand transactionCommand,
+        CancellationToken cancellationToken)
     {
-        switch (command.Amount)
+        switch (transactionCommand.Amount)
         {
-            case <= 0:
-                logger.Warning("Invalid withdrawal amount: {Amount}", command.Amount);
-                return Result.Failure<TransactionResponse>(TransactionError.InvalidAmount(command.Amount));
-            case > MaxWithdrawAmount:
-                logger.Warning("Withdrawal amount exceeds maximum limit: {Amount}", command.Amount);
-                return Result.Failure<TransactionResponse>(TransactionError.ExceedsMaximumLimit(command.Amount));
+            case <= TransactionConstants.MinTransactionAmount:
+                logger.Warning("Invalid withdrawal amount: {Amount}", transactionCommand.Amount);
+                return Result.Failure<TransactionResponse>(TransactionError.InvalidAmount(transactionCommand.Amount));
+            case > TransactionConstants.MaxWithdrawAmount:
+                logger.Warning("Withdrawal amount exceeds maximum limit: {Amount}", transactionCommand.Amount);
+                return Result.Failure<TransactionResponse>(
+                    TransactionError.ExceedsMaximumLimit(transactionCommand.Amount));
         }
 
         Account? account =
-            await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == command.AccountId, cancellationToken);
+            await context.Accounts.FirstOrDefaultAsync(acc => acc.Id == transactionCommand.AccountId,
+                cancellationToken);
 
-        if (account is null)
+        if (account == null)
         {
-            return Result.Failure<TransactionResponse>(AccountError.NotFound(command.AccountId));
+            return Result.Failure<TransactionResponse>(AccountError.NotFound(transactionCommand.AccountId));
         }
 
-        if (account.Balance < command.Amount)
+        if (account.Balance < transactionCommand.Amount)
         {
             logger.Warning("Insufficient funds: Account {AccountId}, Balance {Balance}, Withdrawal Amount {Amount}",
-                account.Id, account.Balance, command.Amount);
+                account.Id, account.Balance, transactionCommand.Amount);
             return Result.Failure<TransactionResponse>(
-                TransactionError.InsufficientFunds(account.Balance, command.Amount));
+                TransactionError.InsufficientFunds(account.Balance, transactionCommand.Amount));
         }
 
-        IDbContextTransaction? transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
             var withdrawTransaction = new Transaction
             {
-                AccountId = command.AccountId,
+                Id = Guid.NewGuid(),
+                AccountId = transactionCommand.AccountId,
                 Type = TransactionType.Withdraw,
-                Amount = command.Amount,
+                Amount = transactionCommand.Amount,
                 TargetAccountNumber = account.AccountNumber,
                 CreatedAt = timeProvider.GetUtcNow()
             };
 
+            account.Balance -= transactionCommand.Amount;
             context.Transactions.Add(withdrawTransaction);
-
-            account.Balance -= command.Amount;
-            context.Accounts.Update(account);
 
             await context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
@@ -68,7 +72,7 @@ internal sealed class WithdrawCommandHandler(IApplicationDbContext context, Time
             logger.Information(
                 "Withdrawal successful: Account {AccountId}, Amount {Amount}, Remaining Balance {Balance}",
                 account.Id,
-                command.Amount,
+                transactionCommand.Amount,
                 account.Balance);
 
             var response = new TransactionResponse(
@@ -87,7 +91,7 @@ internal sealed class WithdrawCommandHandler(IApplicationDbContext context, Time
             logger.Error(
                 ex,
                 "Failed to process withdrawal for account {AccountId}: {Message}",
-                command.AccountId,
+                transactionCommand.AccountId,
                 ex.Message);
 
             await transaction.RollbackAsync(cancellationToken);
