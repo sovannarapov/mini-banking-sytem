@@ -1,0 +1,52 @@
+### GetAccountList request
+
+GET http://localhost:5000/api/v1/accounts
+
+### GetAccountById request
+
+GET http://localhost:5000/api/v1/accounts/038799dd-87d0-471e-3dbf-08dd7b72f08f
+
+### CreateAccount request
+
+POST http://localhost:5000/api/v1/accounts
+Content-Type: application/json
+
+{
+  "ownerName": "Sten Smith",
+  "accountType": 1
+}
+
+### GetAccountTransactionHistory request
+
+GET http://localhost:5000/api/v1/accounts/038799dd-87d0-471e-3dbf-08dd7b72f08f/transactions?type=Transfer&fromDate=2024-01-01&page=1&pageSize=5
+
+### DepositTransaction request
+
+POST http://localhost:5000/api/v1/transactions/deposit
+Content-Type: application/json
+
+{
+  "accountId": "038799dd-87d0-471e-3dbf-08dd7b72f08f",
+  "amount": 0
+}
+
+### WithdrawTransaction request
+
+POST http://localhost:5000/api/v1/transactions/withdraw
+Content-Type: application/json
+
+{
+  "accountId": "038799dd-87d0-471e-3dbf-08dd7b72f08f",
+  "amount": 0
+}
+
+### TransferTransaction request
+
+POST http://localhost:5000/api/v1/transactions/transfer
+Content-Type: application/json
+
+{
+  "accountId": "038799dd-87d0-471e-3dbf-08dd7b72f08f",
+  "targetAccountNumber": "9988776655",
+  "amount": 250
+}
