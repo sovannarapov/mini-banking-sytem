@@ -1,3 +1,4 @@
+using Application.Common.Mappings;
 using Application.Dtos.Account;
 using Application.Features.Accounts.Create;
 using MediatR;
@@ -12,13 +13,10 @@ internal sealed class Create : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/accounts", 
-            async (CreateAccountRequest request, ISender sender, CancellationToken cancellationToken) =>
+            async (CreateAccountRequest request, ISender sender,
+                IMapper<CreateAccountRequest, CreateAccountCommand> mapper, CancellationToken cancellationToken) =>
             {
-                var command = new CreateAccountCommand
-                {
-                    OwnerName = request.OwnerName,
-                    AccountType = request.AccountType
-                };
+                CreateAccountCommand command = mapper.Map(request);
 
                 Result<AccountResponse> result = await sender.Send(command, cancellationToken);
 
