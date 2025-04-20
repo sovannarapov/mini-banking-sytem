@@ -1,3 +1,5 @@
+using System.Reflection;
+using Application.Common.Mappings;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -75,5 +77,23 @@ internal static class ServiceCollectionExtensions
         app.MapEndpoints(versionedGroup);
 
         return app;
+    }
+
+    internal static IServiceCollection AddMappings(this IServiceCollection services, Assembly assembly)
+    {
+        var mapperTypes = assembly.GetTypes()
+            .Where(t => t.GetInterfaces().Any(i =>
+                i.IsGenericType &&
+                i.GetGenericTypeDefinition() == typeof(IMapper<,>)))
+            .ToList();
+
+        foreach (Type? mapperType in mapperTypes)
+        {
+            Type mapperInterface = mapperType.GetInterfaces()
+                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMapper<,>));
+            services.AddScoped(mapperInterface, mapperType);
+        }
+
+        return services;
     }
 }
