@@ -1,5 +1,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Extensions;
 using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Shared;
@@ -46,7 +47,7 @@ internal sealed class GetTransactionHistoryQueryHandler(IApplicationDbContext co
             .Take(request.PageSize)
             .Select(t => new TransactionHistoryItem(
                 t.Id,
-                t.Type,
+                t.Type.GetDisplayName(),
                 t.Amount,
                 t.TargetAccountNumber,
                 t.CreatedAt
