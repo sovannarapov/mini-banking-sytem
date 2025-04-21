@@ -6,7 +6,7 @@ using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Transactions;
 
-internal sealed class TransactionHistory : IEndpoint
+internal sealed class GetHistory : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
