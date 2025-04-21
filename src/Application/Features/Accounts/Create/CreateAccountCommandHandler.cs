@@ -1,37 +1,47 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Dtos.Account;
-using Application.Services;
+using Application.Interfaces;
 using Domain.Accounts;
+using Domain.Constants;
 using Domain.Extensions;
 using Shared;
 
 namespace Application.Features.Accounts.Create;
 
-internal sealed class CreateAccountCommandHandler(IApplicationDbContext context, TimeProvider timeProvider) : ICommandHandler<CreateAccountCommand, AccountResponse>
+public sealed class CreateAccountCommandHandler(
+    IApplicationDbContext context,
+    IAccountNumberGenerator accountNumberGenerator,
+    TimeProvider timeProvider,
+    IGuidGenerator guidGenerator) : ICommandHandler<CreateAccountCommand, AccountResponse>
 {
     public async Task<Result<AccountResponse>> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(command.OwnerName))
+        {
+            return Result.Failure<AccountResponse>(AccountError.Required(command.OwnerName));
+        }
+
         var account = new Account
         {
+            Id = guidGenerator.NewGuid(),
             OwnerName = command.OwnerName,
-            AccountNumber = AccountNumberGenerator.Generate(),
+            AccountNumber = accountNumberGenerator.Generate(),
             AccountType = command.AccountType,
-            Balance = 0,
+            Balance = AccountConstants.MinBalance,
             CreatedAt = timeProvider.GetUtcNow()
         };
 
         context.Accounts.Add(account);
-
         await context.SaveChangesAsync(cancellationToken);
 
         var response = new AccountResponse(
-            Id: account.Id,
-            OwnerName: account.OwnerName,
-            AccountType: account.AccountType.GetDisplayName(),
-            Balance: account.Balance,
-            AccountNumber: account.AccountNumber,
-            CreatedAt: account.CreatedAt
+            account.Id,
+            account.OwnerName,
+            account.AccountType.GetDisplayName(),
+            account.Balance,
+            account.AccountNumber,
+            account.CreatedAt
         );
 
         return Result.Success(response);
