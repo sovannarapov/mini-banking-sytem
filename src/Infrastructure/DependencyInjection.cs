@@ -1,10 +1,11 @@
 using Application.Abstractions.Data;
+using Application.Interfaces;
+using Application.Services;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Shared;
 
 namespace Infrastructure;
 
@@ -19,6 +20,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IGuidGenerator, GuidGenerator>();
 
         return services;
     }
