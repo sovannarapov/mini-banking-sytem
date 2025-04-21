@@ -4,7 +4,7 @@ using Shared;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Accounts;
+namespace Web.Api.Endpoints.Transactions;
 
 internal sealed class TransactionHistory : IEndpoint
 {
@@ -17,7 +17,7 @@ internal sealed class TransactionHistory : IEndpoint
                 Result<TransactionHistoryResponse> result =
                     await sender.Send(query with { AccountId = accountId }, cancellationToken);
 
-                return result.Match(Results.Ok, CustomResults.Problem);
+                return result.Match(Results.Ok<TransactionHistoryResponse>, CustomResults.Problem);
             });
     }
 }
