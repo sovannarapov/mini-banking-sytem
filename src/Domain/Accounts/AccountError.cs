@@ -15,4 +15,9 @@ public static class AccountError
             ? Error.NotFound("Accounts.NotFound", $"Account with ID '{accountId}' was not found.")
             : Error.NotFound("Accounts.NotFound", $"Account with number '{accountNumber}' was not found.");
     }
+
+    public static Error Required(string field)
+    {
+        return Error.Failure("Accounts.Required", $"Field '{field}' is required.");
+    }
 }
