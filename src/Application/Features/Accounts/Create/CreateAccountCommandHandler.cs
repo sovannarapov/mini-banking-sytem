@@ -19,7 +19,12 @@ public sealed class CreateAccountCommandHandler(
     {
         if (string.IsNullOrWhiteSpace(command.OwnerName))
         {
-            return Result.Failure<AccountResponse>(AccountError.Required(command.OwnerName));
+            return Result.Failure<AccountResponse>(AccountError.Required(nameof(command.OwnerName)));
+        }
+
+        if (!Enum.IsDefined(command.AccountType))
+        {
+            return Result.Failure<AccountResponse>(AccountError.Required(nameof(command.AccountType)));
         }
 
         var account = new Account
