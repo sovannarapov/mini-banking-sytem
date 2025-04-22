@@ -9,7 +9,7 @@ public static class TransactionError
         $"The amount {amount} exceeds the maximum deposit limit.");
 
     public static Error Failed(string message) => Error.Failure(
-        "Transaction.Failed",
+        $"{nameof(Transaction)}.Failed",
         $"Transaction failed: {message}");
 
     public static Error InsufficientFunds(decimal balance, decimal amount) => Error.Failure(
@@ -17,7 +17,7 @@ public static class TransactionError
         $"Account balance {balance} is insufficient for withdrawal amount {amount}.");
 
     public static Error InvalidAmount(decimal amount) => Error.Failure(
-        "Transaction.InvalidAmount",
+        $"{nameof(Transaction)}.InvalidAmount",
         $"{amount} must be greater than zero."
     );
 }
