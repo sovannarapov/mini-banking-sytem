@@ -12,7 +12,7 @@ namespace Tests.Features.Accounts.Create;
 public class CreateAccountCommandHandlerTests : AccountBaseTest
 {
     [Fact]
-    public async Task Handle_ShouldCreateAccount_WhenCommandIsValid()
+    public async Task Handle_ShouldCreateAccount_WhenAllRequiredFieldsProvided()
     {
         // Arrange
         var command = new CreateAccountCommand
@@ -58,7 +58,7 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
     }
 
     [Fact]
-    public async Task Handle_ShouldNotCreateAccount_WhenCommandIsInvalid()
+    public async Task Handle_ShouldNotCreateAccount_WhenOwnerNameIsMissing()
     {
         // Arrange
         var command = new CreateAccountCommand
@@ -80,6 +80,41 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(Error.Failure($"{nameof(Account)}.Required", $"{nameof(command.OwnerName)} is required."));
+
+        MockDbContext.Verify(applicationDbContext => applicationDbContext.Accounts.Add(
+                It.Is<Account>(account =>
+                    account.OwnerName == command.OwnerName &&
+                    account.Balance == AccountConstants.MinBalance &&
+                    account.AccountType == command.AccountType)),
+            Times.Never);
+        MockDbContext.Verify(applicationDbContext => applicationDbContext.SaveChangesAsync(
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+    
+    [Fact]
+    public async Task Handle_ShouldNotCreateAccount_WhenAccountTypeIsMissing()
+    {
+        // Arrange
+        var command = new CreateAccountCommand
+        {
+            OwnerName = "John Doe",
+            AccountType = default
+        };
+
+        var createAccountHandler = new CreateAccountCommandHandler(
+            MockDbContext.Object,
+            MockAccountNumberGenerator.Object,
+            MockTimeProvider.Object,
+            MockGuidGenerator.Object);
+
+        // Act
+        Result<AccountResponse> result = await createAccountHandler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(Error.Failure($"{nameof(Account)}.Required", $"{nameof(command.AccountType)} is required."));
 
         MockDbContext.Verify(applicationDbContext => applicationDbContext.Accounts.Add(
                 It.Is<Account>(account =>
