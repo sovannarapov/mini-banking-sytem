@@ -12,7 +12,7 @@ public static class MockDbSetExtensions
         mockSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(data.Expression);
         mockSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(data.ElementType);
         mockSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
-        
+
         return mockSet.Object;
     }
 }
