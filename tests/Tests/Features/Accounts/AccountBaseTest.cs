@@ -14,7 +14,7 @@ public abstract class AccountBaseTest
     protected readonly Mock<IGuidGenerator> MockGuidGenerator;
 
     protected readonly Guid FixedAccountId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-    protected readonly DateTime FixedDate = new(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+    protected readonly DateTimeOffset FixedDate = DateTimeOffset.UtcNow;
     protected const string FixedAccountNumber = "0123456789";
 
     protected AccountBaseTest()
