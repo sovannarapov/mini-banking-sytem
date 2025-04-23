@@ -6,7 +6,7 @@ using Shared;
 
 namespace Tests.Features.Accounts.GetById;
 
-public sealed class GetAccountByIdQueryHandlerTest : AccountBaseTest
+public sealed class GetAccountByIdQueryHandlerTests : AccountBaseTest
 {
     [Fact]
     public async Task Handle_ShouldReturnAccount_WhenAccountExists()
