@@ -7,7 +7,8 @@ using Shared;
 
 namespace Application.Features.Accounts.Get;
 
-public sealed class GetAccountQueryHandler(IApplicationDbContext context) : IQueryHandler<GetAccountQuery, List<AccountResponse>>
+public sealed class GetAccountQueryHandler(IApplicationDbContext context)
+    : IQueryHandler<GetAccountQuery, List<AccountResponse>>
 {
     public async Task<Result<List<AccountResponse>>> Handle(GetAccountQuery query, CancellationToken cancellationToken)
     {
