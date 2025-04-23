@@ -12,11 +12,11 @@ public static class AccountError
         }
 
         return accountId.HasValue
-            ? Error.NotFound($"{nameof(Account)}.NotFound", $"Account with ID '{accountId}' was not found.")
-            : Error.NotFound($"{nameof(Account)}.NotFound", $"Account with number '{accountNumber}' was not found.");
+            ? Error.NotFound($"{nameof(Account.Id)}.NotFound", $"Account with ID '{accountId}' was not found.")
+            : Error.NotFound($"{nameof(Account.AccountNumber)}.NotFound", $"Account with number '{accountNumber}' was not found.");
     }
 
     public static Error Required(string fieldName) => Error.Failure(
-        $"{nameof(Account)}.Required", 
+        $"{fieldName}.Required",
         $"{fieldName} is required.");
 }
