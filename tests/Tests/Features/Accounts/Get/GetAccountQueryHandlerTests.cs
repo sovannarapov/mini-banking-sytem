@@ -44,4 +44,21 @@ public class GetAccountQueryHandlerTests : AccountBaseTest
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(2);
     }
+
+    [Fact]
+    public async Task Handle_ShouldReturnEmpty_WhenAccountDoesNotExist()
+    {
+        // Arrange
+        var query = new GetAccountQuery();
+
+        var getAccountQueryHandler = new GetAccountQueryHandler(MockDbContext.Object);
+
+        // Act
+        Result<List<AccountResponse>> result = await getAccountQueryHandler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEmpty();
+    }
 }
