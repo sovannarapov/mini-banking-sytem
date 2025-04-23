@@ -91,7 +91,7 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
                 It.IsAny<CancellationToken>()),
             Times.Never);
     }
-    
+
     [Fact]
     public async Task Handle_ShouldNotCreateAccount_WhenAccountTypeIsMissing()
     {
