@@ -79,7 +79,7 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(Error.Failure($"{nameof(Account)}.Required", $"{nameof(command.OwnerName)} is required."));
+        result.Error.Should().Be(Error.Failure($"{nameof(command.OwnerName)}.Required", $"{nameof(command.OwnerName)} is required."));
 
         MockDbContext.Verify(applicationDbContext => applicationDbContext.Accounts.Add(
                 It.Is<Account>(account =>
@@ -114,7 +114,7 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
         // Assert
         result.Should().NotBeNull();
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(Error.Failure($"{nameof(Account)}.Required", $"{nameof(command.AccountType)} is required."));
+        result.Error.Should().Be(Error.Failure($"{nameof(command.AccountType)}.Required", $"{nameof(command.AccountType)} is required."));
 
         MockDbContext.Verify(applicationDbContext => applicationDbContext.Accounts.Add(
                 It.Is<Account>(account =>
