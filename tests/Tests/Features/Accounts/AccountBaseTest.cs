@@ -2,6 +2,7 @@ using Application.Abstractions.Data;
 using Application.Interfaces;
 using Domain.Accounts;
 using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
 using Moq;
 
 namespace Tests.Features.Accounts;
@@ -20,10 +21,10 @@ public abstract class AccountBaseTest
 
     protected AccountBaseTest()
     {
-        DbSet<Account> accountsDbSet = Accounts.AsQueryable().BuildMockDbSet();
+        Mock<DbSet<Account>> accountsDbSet = Accounts.AsQueryable().BuildMockDbSet();
 
         MockDbContext = new Mock<IApplicationDbContext>();
-        MockDbContext.Setup(applicationDbContext => applicationDbContext.Accounts).Returns(accountsDbSet);
+        MockDbContext.Setup(applicationDbContext => applicationDbContext.Accounts).Returns(accountsDbSet.Object);
 
         MockTimeProvider = new Mock<TimeProvider>();
         MockTimeProvider.Setup(timeProvider => timeProvider.GetUtcNow()).Returns(FixedDate);
