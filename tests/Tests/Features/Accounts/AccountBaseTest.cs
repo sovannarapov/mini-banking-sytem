@@ -16,11 +16,11 @@ public abstract class AccountBaseTest
     protected readonly Guid FixedAccountId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
     protected readonly DateTimeOffset FixedDate = DateTimeOffset.UtcNow;
     protected const string FixedAccountNumber = "0123456789";
+    protected readonly List<Account> Accounts = [];
 
     protected AccountBaseTest()
     {
-        IEnumerable<Account> accounts = [];
-        DbSet<Account> accountsDbSet = accounts.AsQueryable().BuildMockDbSet();
+        DbSet<Account> accountsDbSet = Accounts.AsQueryable().BuildMockDbSet();
 
         MockDbContext = new Mock<IApplicationDbContext>();
         MockDbContext.Setup(applicationDbContext => applicationDbContext.Accounts).Returns(accountsDbSet);
