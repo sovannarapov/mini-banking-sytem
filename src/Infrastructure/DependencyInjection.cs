@@ -1,7 +1,9 @@
 using Application.Abstractions.Data;
+using Application.Common.Interfaces;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Database;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,10 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<IValidationService, ValidationService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ITransactionService, TransactionService>();
+
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IGuidGenerator, GuidGenerator>();
 
