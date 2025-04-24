@@ -11,6 +11,17 @@ namespace Tests.Features.Accounts.Create;
 
 public class CreateAccountCommandHandlerTests : AccountBaseTest
 {
+    private readonly CreateAccountCommandHandler _handler;
+
+    public CreateAccountCommandHandlerTests()
+    {
+        _handler = new CreateAccountCommandHandler(
+            MockDbContext.Object,
+            MockAccountNumberGenerator.Object,
+            MockTimeProvider.Object,
+            MockGuidGenerator.Object);
+    }
+
     [Fact]
     public async Task Handle_ShouldCreateAccount_WhenAllRequiredFieldsProvided()
     {
@@ -21,14 +32,8 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
             AccountType = AccountType.Savings
         };
 
-        var createAccountHandler = new CreateAccountCommandHandler(
-            MockDbContext.Object,
-            MockAccountNumberGenerator.Object,
-            MockTimeProvider.Object,
-            MockGuidGenerator.Object);
-
         // Act
-        Result<AccountResponse> result = await createAccountHandler.Handle(command, CancellationToken.None);
+        Result<AccountResponse> result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
@@ -67,14 +72,8 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
             AccountType = AccountType.Savings
         };
 
-        var createAccountHandler = new CreateAccountCommandHandler(
-            MockDbContext.Object,
-            MockAccountNumberGenerator.Object,
-            MockTimeProvider.Object,
-            MockGuidGenerator.Object);
-
         // Act
-        Result<AccountResponse> result = await createAccountHandler.Handle(command, CancellationToken.None);
+        Result<AccountResponse> result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
@@ -102,14 +101,8 @@ public class CreateAccountCommandHandlerTests : AccountBaseTest
             AccountType = default
         };
 
-        var createAccountHandler = new CreateAccountCommandHandler(
-            MockDbContext.Object,
-            MockAccountNumberGenerator.Object,
-            MockTimeProvider.Object,
-            MockGuidGenerator.Object);
-
         // Act
-        Result<AccountResponse> result = await createAccountHandler.Handle(command, CancellationToken.None);
+        Result<AccountResponse> result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
