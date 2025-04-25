@@ -20,6 +20,6 @@ public sealed class GetAccountByIdQueryHandler(IApplicationDbContext context)
                 acc.Balance, acc.AccountNumber, acc.CreatedAt))
             .SingleOrDefaultAsync(cancellationToken);
 
-        return account ?? Result.Failure<AccountResponse>(AccountError.NotFound(query.AccountId));
+        return account ?? Result.Failure<AccountResponse>(AccountError.NotFound(accountId: query.AccountId));
     }
 }
