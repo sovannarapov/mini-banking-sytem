@@ -26,7 +26,7 @@ public sealed class DepositTransactionCommandHandler(
 
         if (account is null)
         {
-            return Result.Failure<TransactionResponse>(AccountError.NotFound(command.AccountId));
+            return Result.Failure<TransactionResponse>(AccountError.NotFound(accountId: command.AccountId));
         }
 
         accountService.UpdateBalance(account, command.Amount);
