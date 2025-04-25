@@ -32,7 +32,7 @@ internal sealed class TransferTransactionCommandHandler(
 
         if (sourceAccount == null)
         {
-            return Result.Failure<TransferResponse>(AccountError.NotFound(command.AccountId));
+            return Result.Failure<TransferResponse>(AccountError.NotFound(accountId: command.AccountId));
         }
 
         Account? targetAccount =
