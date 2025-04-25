@@ -14,7 +14,7 @@ namespace Tests.Features.Transactions;
 public abstract class TransactionBaseTest : AccountBaseTest
 {
     protected const decimal FixedAmount = 1000;
-
+    protected const decimal InvalidFixedAmount = -1000m;
     protected readonly Guid FixedTransactionId = Guid.Parse("bbbbbbbb-cccc-dddd-eeee-ffffffffffff");
     protected readonly Mock<IAccountService> MockAccountService;
     protected readonly Mock<ITransactionService> MockTransactionService;
@@ -34,13 +34,14 @@ public abstract class TransactionBaseTest : AccountBaseTest
         MockGuidGenerator.Setup(guidGenerator => guidGenerator.NewGuid()).Returns(FixedAccountId);
 
         MockValidationService = new Mock<IValidationService>();
-        MockValidationService.Setup(validationService => validationService.ValidateDepositAmount(FixedAmount))
+        MockValidationService.Setup(validationService => validationService.ValidateDepositAmount(It.IsAny<decimal>()))
             .Returns(Result.Success);
 
         MockAccountService = new Mock<IAccountService>();
         MockAccountService
-            .Setup(accountService => accountService.GetAccountByIdAsync(It.IsAny<Guid>(),It.IsAny<CancellationToken>()))
-            .Returns(It.IsAny<Task<Account?>>());
+            .Setup(accountService =>
+                accountService.GetAccountByIdAsync(FixedAccountId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Account());
         MockAccountService
             .Setup(accountService => accountService.UpdateBalance(It.IsAny<Account>(), It.IsAny<decimal>()))
             .Callback<Account, decimal>((acc, amount) => acc.Balance += amount);
