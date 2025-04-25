@@ -38,7 +38,7 @@ internal sealed class WithdrawTransactionCommandHandler(
 
         if (account == null)
         {
-            return Result.Failure<TransactionResponse>(AccountError.NotFound(transactionCommand.AccountId));
+            return Result.Failure<TransactionResponse>(AccountError.NotFound(accountId: transactionCommand.AccountId));
         }
 
         if (account.Balance < transactionCommand.Amount)
