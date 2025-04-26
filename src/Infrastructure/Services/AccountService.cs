@@ -2,6 +2,7 @@ using Application.Abstractions.Data;
 using Application.Common.Interfaces;
 using Domain.Accounts;
 using Microsoft.EntityFrameworkCore;
+using Shared;
 
 namespace Infrastructure.Services;
 
@@ -12,8 +13,14 @@ public class AccountService(IApplicationDbContext context) : IAccountService
         return await context.Accounts.FirstOrDefaultAsync(account => account.Id == accountId, cancellationToken);
     }
 
-    public void UpdateBalance(Account account, decimal amount)
+    public void Deposit(Account account, decimal amount) => account.Balance += amount;
+
+    public Result Withdraw(Account account, decimal amount)
     {
-        account.Balance += amount;
+        decimal newBalance = account.Balance - amount;
+
+        account.Balance = newBalance;
+
+        return Result.Success();
     }
 }
