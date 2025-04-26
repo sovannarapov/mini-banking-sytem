@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
 
-namespace Tests.Features.Accounts;
+namespace Unit.Features.Accounts;
 
 public abstract class AccountBaseTest
 {

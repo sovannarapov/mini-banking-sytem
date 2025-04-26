@@ -7,7 +7,7 @@ using FluentAssertions;
 using Moq;
 using Shared;
 
-namespace Tests.Features.Transactions.Deposit;
+namespace Unit.Features.Transactions.Commands;
 
 public sealed class DepositTransactionCommandHandlerTests : TransactionBaseTest
 {

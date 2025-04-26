@@ -1,7 +1,8 @@
 using NetArchTest.Rules;
 using Shouldly;
+using Unit.Common;
 
-namespace Tests.Layers;
+namespace Unit.Layers;
 
 public class LayerTests : BaseTest
 {

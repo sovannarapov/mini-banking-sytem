@@ -7,7 +7,7 @@ using FluentAssertions;
 using Moq;
 using Shared;
 
-namespace Tests.Features.Transactions.Withdraw;
+namespace Unit.Features.Transactions.Commands;
 
 public class WithdrawTransactionCommandHandlerTests : TransactionBaseTest
 {
