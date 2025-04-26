@@ -1,10 +1,10 @@
-# 📚 Project Structure - Mini Banking System
+# Mini Banking System
 
 The **mini-banking-system** is a modular, scalable banking backend application built with **.NET**, designed following **Clean Architecture, CQRS, SOLID principles, and Test-Driven Development (TDD)**.
 
 ---
 
-## 🗂️ Directory Structure
+## 📚 Project Structure
 
 ### `src/`
 Contains all production code, divided by logical layers.
