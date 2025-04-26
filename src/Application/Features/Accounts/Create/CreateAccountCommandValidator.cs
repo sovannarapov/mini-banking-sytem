@@ -7,7 +7,7 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
 {
     public CreateAccountCommandValidator()
     {
-        RuleFor(c => c.OwnerName)
+        RuleFor(createAccountCommand => createAccountCommand.OwnerName)
             .NotNull()
             .WithMessage("Owner name cannot be null.")
             .NotEmpty()
@@ -24,7 +24,7 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .WithMessage("Owner name must contain at least 2 non-whitespace characters.");
 
 
-        RuleFor(c => c.AccountType)
+        RuleFor(createAccountCommand => createAccountCommand.AccountType)
             .NotEmpty()
             .WithMessage("Account type is required.")
             .IsInEnum()

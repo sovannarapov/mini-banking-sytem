@@ -4,7 +4,7 @@ namespace Application.Features.Transactions.History;
 
 public record TransactionHistoryItem(
     Guid Id, 
-    TransactionType Type, 
+    string Type, 
     decimal Amount, 
     string? TargetAccountNumber, 
     DateTimeOffset CreatedAt

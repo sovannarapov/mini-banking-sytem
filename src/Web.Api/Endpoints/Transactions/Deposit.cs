@@ -1,3 +1,4 @@
+using Application.Common.Mappings;
 using Application.Dtos.Transaction;
 using Application.Features.Transactions.Deposit;
 using MediatR;
@@ -12,14 +13,16 @@ internal sealed class Deposit : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/transactions/deposit",
-            async (DepositRequest request, ISender sender, CancellationToken cancellationToken) =>
-            {
-                var command = new DepositTransactionCommand(request.AccountId, request.Amount);
+                async (DepositTransactionRequest request, ISender sender,
+                    IMapper<DepositTransactionRequest, DepositTransactionCommand> mapper,
+                    CancellationToken cancellationToken) =>
+                {
+                    DepositTransactionCommand command = mapper.Map(request);
 
-                Result<TransactionResponse> result = await sender.Send(command, cancellationToken);
+                    Result<TransactionResponse> result = await sender.Send(command, cancellationToken);
 
-                return result.Match(Results.Ok, CustomResults.Problem);
-            })
+                    return result.Match(Results.Ok, CustomResults.Problem);
+                })
             .HasApiVersion(1.0)
             .Produces<TransactionResponse>()
             .WithSummary("Create a new deposit transaction")

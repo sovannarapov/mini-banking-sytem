@@ -3,7 +3,7 @@ using Domain.Transactions;
 
 namespace Application.Features.Transactions.History;
 
-public record GetTransactionHistoryQuery : IQuery<TransactionHistoryResponse>
+public sealed record GetTransactionHistoryQuery : IQuery<TransactionHistoryResponse>
 {
     public Guid AccountId { get; init; }
     public TransactionType? Type { get; init; }

@@ -32,7 +32,7 @@ internal sealed class TransferTransactionCommandHandler(
 
         if (sourceAccount == null)
         {
-            return Result.Failure<TransferResponse>(AccountError.NotFound(command.AccountId));
+            return Result.Failure<TransferResponse>(AccountError.NotFound(accountId: command.AccountId));
         }
 
         Account? targetAccount =
@@ -49,7 +49,7 @@ internal sealed class TransferTransactionCommandHandler(
             logger.Warning("Insufficient funds: Account {AccountId}, Balance {Balance}, Withdrawal Amount {Amount}",
                 sourceAccount.Id, sourceAccount.Balance, command.Amount);
             return Result.Failure<TransferResponse>(
-                TransactionError.InsufficientFunds(sourceAccount.Balance, command.Amount));
+                TransactionError.InsufficientBalance(sourceAccount.Balance, command.Amount));
         }
 
         IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(cancellationToken);

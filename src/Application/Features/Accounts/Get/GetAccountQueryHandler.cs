@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Dtos.Account;
@@ -8,7 +7,8 @@ using Shared;
 
 namespace Application.Features.Accounts.Get;
 
-internal sealed class GetAccountQueryHandler(IApplicationDbContext context) : IQueryHandler<GetAccountQuery, List<AccountResponse>>
+public sealed class GetAccountQueryHandler(IApplicationDbContext context)
+    : IQueryHandler<GetAccountQuery, List<AccountResponse>>
 {
     public async Task<Result<List<AccountResponse>>> Handle(GetAccountQuery query, CancellationToken cancellationToken)
     {
