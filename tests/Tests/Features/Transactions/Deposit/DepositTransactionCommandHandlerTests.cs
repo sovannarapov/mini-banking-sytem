@@ -23,34 +23,41 @@ public sealed class DepositTransactionCommandHandlerTests : TransactionBaseTest
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenAmountIsInvalid()
+    public async Task Handle_ShouldReturnFailure_WhenAccountNotFound()
     {
         // Arrange
-        var command = new DepositTransactionCommand(FixedAccountId, InvalidFixedAmount);
-        Error error = TransactionError.InvalidAmount(InvalidFixedAmount);
+        var command = new DepositTransactionCommand(FixedAccountId, FixedAmount);
 
         MockValidationService.Setup(validationService => validationService.ValidateDepositAmount(It.IsAny<decimal>()))
-            .Returns(Result.Failure(error));
+            .Returns(Result.Success());
+
+        MockAccountService
+            .Setup(accountService =>
+                accountService.GetAccountByIdAsync(FixedAccountId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Account?)null);
 
         // Act
         Result<TransactionResponse> result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(error);
+        result.Error.Should().Be(AccountError.NotFound(FixedAccountId));
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenAccountNotFound()
+    public async Task Handle_ShouldReturnFailure_WhenValidationFailed()
     {
         // Arrange
-        var command = new DepositTransactionCommand(FixedAccountId, FixedAmount);
-        Error error = AccountError.NotFound(FixedAccountId);
+        var command = new DepositTransactionCommand(FixedAccountId, InvalidFixedAmount);
+        Error error = TransactionError.InvalidAmount(InvalidFixedAmount);
 
         MockAccountService
-            .Setup(accountService =>
-                accountService.GetAccountByIdAsync(FixedAccountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Account?)null);
+            .Setup(accountService => accountService
+                .GetAccountByIdAsync(FixedAccountId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Account());
+
+        MockValidationService.Setup(validationService => validationService.ValidateDepositAmount(It.IsAny<decimal>()))
+            .Returns(Result.Failure(error));
 
         // Act
         Result<TransactionResponse> result = await _handler.Handle(command, CancellationToken.None);
@@ -65,14 +72,17 @@ public sealed class DepositTransactionCommandHandlerTests : TransactionBaseTest
     {
         // Arrange
         var command = new DepositTransactionCommand(FixedAccountId, FixedAmount);
+        var expectedResponse = new TransactionResponse(Guid.NewGuid(), FixedAccountId,
+            TransactionType.Deposit.GetDisplayName(), FixedAmount, FixedAccountNumber, FixedDate);
         Account account = new();
+
+        MockValidationService.Setup(validationService => validationService.ValidateDepositAmount(It.IsAny<decimal>()))
+            .Returns(Result.Success());
 
         MockAccountService
             .Setup(accountService =>
                 accountService.GetAccountByIdAsync(FixedAccountId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(account);
-
-        var expectedResponse = new TransactionResponse(Guid.NewGuid(), FixedAccountId, TransactionType.Deposit.GetDisplayName(), FixedAmount, FixedAccountNumber, FixedDate);
 
         MockTransactionService.Setup(s => s.ProcessDepositAsync(account, FixedAmount, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success(expectedResponse));
@@ -84,7 +94,8 @@ public sealed class DepositTransactionCommandHandlerTests : TransactionBaseTest
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(expectedResponse);
 
-        MockAccountService.Verify(s => s.UpdateBalance(account, FixedAmount), Times.Once);
-        MockTransactionService.Verify(s => s.ProcessDepositAsync(account, FixedAmount, It.IsAny<CancellationToken>()), Times.Once);
+        MockAccountService.Verify(s => s.Deposit(account, FixedAmount), Times.Once);
+        MockTransactionService.Verify(s => s.ProcessDepositAsync(account, FixedAmount, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }
