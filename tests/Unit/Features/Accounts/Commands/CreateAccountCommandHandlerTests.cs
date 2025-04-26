@@ -3,11 +3,9 @@ using Application.Features.Accounts.Create;
 using Domain.Accounts;
 using Domain.Constants;
 using Domain.Extensions;
-using FluentAssertions;
-using Moq;
 using Shared;
 
-namespace Tests.Features.Accounts.Create;
+namespace Unit.Features.Accounts.Commands;
 
 public class CreateAccountCommandHandlerTests : AccountBaseTest
 {

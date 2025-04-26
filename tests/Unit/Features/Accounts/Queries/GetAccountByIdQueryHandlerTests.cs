@@ -4,7 +4,7 @@ using Domain.Accounts;
 using FluentAssertions;
 using Shared;
 
-namespace Tests.Features.Accounts.GetById;
+namespace Unit.Features.Accounts.Queries;
 
 public sealed class GetAccountByIdQueryHandlerTests : AccountBaseTest
 {

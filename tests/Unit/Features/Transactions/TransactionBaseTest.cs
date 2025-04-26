@@ -3,9 +3,9 @@ using Domain.Transactions;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
-using Tests.Features.Accounts;
+using Unit.Features.Accounts;
 
-namespace Tests.Features.Transactions;
+namespace Unit.Features.Transactions;
 
 public abstract class TransactionBaseTest : AccountBaseTest
 {

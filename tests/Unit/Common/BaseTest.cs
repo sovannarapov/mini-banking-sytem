@@ -4,7 +4,7 @@ using Domain.Accounts;
 using Infrastructure.Database;
 using Web.Api;
 
-namespace Tests;
+namespace Unit.Common;
 
 public abstract class BaseTest
 {
