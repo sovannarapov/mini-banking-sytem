@@ -12,7 +12,7 @@ public static class TransactionError
         $"{nameof(Transaction)}.Failed",
         $"Transaction failed: {message}");
 
-    public static Error InsufficientFunds(decimal balance, decimal amount) => Error.Failure(
+    public static Error InsufficientBalance(decimal balance, decimal amount) => Error.Failure(
         $"{nameof(Transaction)}.InsufficientFunds",
         $"Account balance {balance} is insufficient for withdrawal amount {amount}.");
 
