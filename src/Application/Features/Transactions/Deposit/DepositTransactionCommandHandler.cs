@@ -15,13 +15,6 @@ public sealed class DepositTransactionCommandHandler(
     public async Task<Result<TransactionResponse>> Handle(DepositTransactionCommand command,
         CancellationToken cancellationToken)
     {
-        Result validationResult = validationService.ValidateDepositAmount(command.Amount);
-
-        if (validationResult.IsFailure)
-        {
-            return Result.Failure<TransactionResponse>(validationResult.Error);
-        }
-
         Account? account = await accountService.GetAccountByIdAsync(command.AccountId, cancellationToken);
 
         if (account is null)
@@ -29,7 +22,14 @@ public sealed class DepositTransactionCommandHandler(
             return Result.Failure<TransactionResponse>(AccountError.NotFound(accountId: command.AccountId));
         }
 
-        accountService.UpdateBalance(account, command.Amount);
+        Result validationResult = validationService.ValidateDepositAmount(command.Amount);
+
+        if (validationResult.IsFailure)
+        {
+            return Result.Failure<TransactionResponse>(validationResult.Error);
+        }
+
+        accountService.Deposit(account, command.Amount);
 
         return await transactionService.ProcessDepositAsync(account, command.Amount, cancellationToken);
     }
