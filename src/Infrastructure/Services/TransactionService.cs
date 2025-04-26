@@ -56,4 +56,57 @@ public class TransactionService(IApplicationDbContext context, TimeProvider time
             return Result.Failure<TransactionResponse>(TransactionError.Failed(ex.Message));
         }
     }
+
+    public async Task<Result<TransactionResponse>> ProcessWithdrawalAsync(Account account, decimal amount, CancellationToken cancellationToken)
+    {
+        IDbContextTransaction transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            var withdrawTransaction = new Transaction
+            {
+                Id = Guid.NewGuid(),
+                AccountId = account.Id,
+                Type = TransactionType.Withdraw,
+                Amount = amount,
+                TargetAccountNumber = account.AccountNumber,
+                CreatedAt = timeProvider.GetUtcNow()
+            };
+
+            account.Balance -= amount;
+            context.Transactions.Add(withdrawTransaction);
+
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            logger.Information(
+                "Withdrawal successful: Account {AccountId}, Amount {Amount}, Remaining Balance {Balance}",
+                account.Id,
+                amount,
+                account.Balance);
+
+            var response = new TransactionResponse(
+                withdrawTransaction.Id,
+                withdrawTransaction.AccountId,
+                withdrawTransaction.Type.GetDisplayName(),
+                withdrawTransaction.Amount,
+                withdrawTransaction.TargetAccountNumber,
+                withdrawTransaction.CreatedAt
+            );
+
+            return Result.Success(response);
+        }
+        catch (Exception ex)
+        {
+            logger.Error(
+                ex,
+                "Failed to process withdrawal for account {AccountId}: {Message}",
+                account.Id,
+                ex.Message);
+
+            await transaction.RollbackAsync(cancellationToken);
+
+            return Result.Failure<TransactionResponse>(TransactionError.Failed(ex.Message));
+        }
+    }
 }
