@@ -18,6 +18,11 @@ internal sealed class GetHistory : IEndpoint
                     await sender.Send(query with { AccountId = accountId }, cancellationToken);
 
                 return result.Match(Results.Ok<TransactionHistoryResponse>, CustomResults.Problem);
-            });
+            })
+            .HasApiVersion(1.0)
+            .Produces<TransactionHistoryResponse>(StatusCodes.Status200OK)
+            .WithSummary("Get transaction history by account id")
+            .WithDescription("Retrieves the transaction history of an account by account id.")
+            .WithTags(Tags.Accounts);
     }
 }
