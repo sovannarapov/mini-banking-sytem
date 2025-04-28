@@ -1,10 +1,10 @@
-# 📚 Project Structure - Mini Banking System
+# Mini Banking System
 
-This document describes the folder and file structure of the `sovannarapov-mini-banking-system` project, organized following **Clean Architecture** principles.
+The **mini-banking-system** is a modular, scalable banking backend application built with **.NET**, designed following **Clean Architecture, CQRS, SOLID principles, and Test-Driven Development (TDD)**.
 
 ---
 
-## 🗂️ Directory Structure
+## 📚 Project Structure
 
 ### `src/`
 Contains all production code, divided by logical layers.
