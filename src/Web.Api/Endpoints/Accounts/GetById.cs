@@ -11,10 +11,10 @@ internal sealed class GetById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/accounts/{accountId:guid}", 
-            async (Guid accountId, ISender sender, CancellationToken cancellationToken) =>
+        endpoints.MapGet("/accounts/{id:guid}",
+            async (Guid id, ISender sender, CancellationToken cancellationToken) =>
             {
-                var query = new GetAccountByIdQuery(accountId);
+                var query = new GetAccountByIdQuery(id);
 
                 Result<AccountResponse> result = await sender.Send(query, cancellationToken);
 
