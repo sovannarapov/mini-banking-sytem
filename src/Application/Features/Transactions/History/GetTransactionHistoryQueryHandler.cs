@@ -8,7 +8,8 @@ using Shared;
 
 namespace Application.Features.Transactions.History;
 
-internal sealed class GetTransactionHistoryQueryHandler(IApplicationDbContext context) : IQueryHandler<GetTransactionHistoryQuery, TransactionHistoryResponse>
+internal sealed class GetTransactionHistoryQueryHandler(IApplicationDbContext context)
+    : IQueryHandler<GetTransactionHistoryQuery, TransactionHistoryResponse>
 {
     public async Task<Result<TransactionHistoryResponse>> Handle(GetTransactionHistoryQuery request,
         CancellationToken cancellationToken)
