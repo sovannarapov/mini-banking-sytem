@@ -1,4 +1,5 @@
 using Application.Abstractions.Messaging;
+using Application.Dtos.Transaction;
 using Domain.Transactions;
 
 namespace Application.Features.Transactions.History;

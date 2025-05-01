@@ -1,4 +1,4 @@
-namespace Application.Features.Transactions.History;
+namespace Application.Dtos.Transaction;
 
 public record TransactionHistoryResponse(
     int TotalCount,

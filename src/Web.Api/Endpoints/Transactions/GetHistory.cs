@@ -1,3 +1,4 @@
+using Application.Dtos.Transaction;
 using Application.Features.Transactions.History;
 using MediatR;
 using Shared;
