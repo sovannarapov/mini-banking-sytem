@@ -10,12 +10,12 @@ internal sealed class GetHistory : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/accounts/{accountId:guid}/transactions",
-            async (Guid accountId, [AsParameters] GetTransactionHistoryQuery query, ISender sender,
+        endpoints.MapGet("/accounts/{id:guid}/transactions",
+            async (Guid id, [AsParameters] GetTransactionHistoryQuery query, ISender sender,
                 CancellationToken cancellationToken) =>
             {
                 Result<TransactionHistoryResponse> result =
-                    await sender.Send(query with { AccountId = accountId }, cancellationToken);
+                    await sender.Send(query with { AccountId = id }, cancellationToken);
 
                 return result.Match(Results.Ok<TransactionHistoryResponse>, CustomResults.Problem);
             })
