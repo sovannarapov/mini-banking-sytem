@@ -3,10 +3,10 @@ using Application.Interfaces;
 
 namespace Application.Services;
 
-public abstract class AccountNumberGenerator : IAccountNumberGenerator
+public class AccountNumberGenerator : IAccountNumberGenerator
 {
     private const int AccountNumberLength = 10;
-    
+
     /// <summary>
     /// Generates a cryptographically secure random account number of 10 digits
     /// </summary>
