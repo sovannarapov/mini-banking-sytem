@@ -1,6 +1,5 @@
 using Application.Dtos.Account;
 using Application.Features.Accounts.Get;
-using Application.Features.Accounts.GetById;
 using MediatR;
 using Shared;
 using Web.Api.Extensions;
